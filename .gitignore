@@ -64,3 +64,6 @@ media/
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+
+hotel/price_gym.txt
+hotel/price_room.txt

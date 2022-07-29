@@ -1,29 +1,27 @@
 from datetime import timedelta
+import json
 
 
-PRICE_GYM = {1: 1000,
-             2: 1800,
-             3: 2500,
-             6: 4000,
-             12: 8000}
-
-PRICE_ROOM = {'Suite': 30000,
-              'Apartment': 22000,
-              'Lux': 15000,
-              'Junior Suite': 11000,
-              'Studio': 8000,
-              'Standard': 5000}
+def read_price_json_from_txt(path):
+    with open('A:\\Django\\hotel_DRF\\hotel\\' + path) as f:
+        data = f.read()
+    js_data = json.loads(data)
+    return js_data
 
 
-def set_price_gym(period):
-    return str(PRICE_GYM[period])
+def set_price(key_dict, price_name):
+    price = read_price_json_from_txt(price_name)
+    return str(price[key_dict])
 
 
-def set_price_room(category):
-    return str(PRICE_ROOM[category])
-
-
-def set_data_end(period, data_start):
+def set_data_end_gym(period: int, data_start):
     days = period * 30
     return data_start + timedelta(days=days)
+
+
+def check_in_hotel_visitor(number_room):
+    if number_room:
+        return True
+    return False
+
 

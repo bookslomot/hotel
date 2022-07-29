@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 from pathlib import Path
+import environ
 
+env = environ.Env()
+environ.Env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,10 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-9qmy(nsu9@u)484sld9nk4l$dkn(k18^)%8i7doymm7hd85@5o'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = []
 
@@ -40,6 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'phonenumber_field',
+    'rest_framework',
+    'django_filters',
 
     'user.apps.UserConfig',
     'hotel.apps.HotelConfig',
@@ -83,11 +88,11 @@ WSGI_APPLICATION = 'hotel_DRF.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'HOST': 'localhost',
-        'USER': 'postgres',
-        'PASSWORD': '1234',
-        'NAME': 'hotel',
-        'PORT': '5432',
+        'HOST': env('DATABASE_HOST'),
+        'USER': env('DATABASE_USER'),
+        'PASSWORD': env('DATABASE_PASSWORD'),
+        'NAME': env('DATABASE_NAME'),
+        'PORT': env('DATABASE_PORT'),
     }
 }
 
