@@ -7,7 +7,7 @@ from user.models import User
 
 
 class Room(models.Model):
-    CAT_CHOICES = (
+    CATEGORY_CHOICES = (
         ('Suite', 'Сюит'),
         ('Apartment', 'Апартамент '),
         ('Lux', 'Люкс '),
@@ -19,7 +19,7 @@ class Room(models.Model):
 
     number = models.PositiveIntegerField('Порядковый номер')
     category = models.CharField('Категория номера',
-                                choices=CAT_CHOICES,
+                                choices=CATEGORY_CHOICES,
                                 max_length=255,
                                 blank=False,
                                 default='Standard')

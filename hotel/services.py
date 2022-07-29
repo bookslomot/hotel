@@ -23,5 +23,3 @@ def check_in_hotel_visitor(number_room):
     if number_room:
         return True
     return False
-
-
