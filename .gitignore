@@ -57,6 +57,7 @@ media/
 *.pyc
 *.db
 *.pid
+reviews/
 
 #PyCharm #
 .idea/**/workspace.xml

@@ -123,3 +123,28 @@ class Gym(models.Model):
         self.price = set_price(self.period, 'price_gym.txt')
         self.visitor.add_gym(self)
         super().save(*args, **kwargs)
+
+
+class Reviews(models.Model):
+    RATING_1_5 = (
+        ('1', 'terribly'),
+        ('2', 'bad'),
+        ('3', 'ok'),
+        ('4', 'good'),
+        ('5', 'amazing')
+    )
+
+    owner = models.ForeignKey(User, verbose_name='Автор отзыва', on_delete=models.PROTECT,)
+    body = models.TextField('Тело текста отзыва', max_length=1024,)
+    file = models.FileField('Прикрепленный файл к отзыву', upload_to='reviews/%Y/%m/%d/', null=True, blank=True,)
+    created_at = models.DateTimeField('Время создания отзыва', auto_now_add=True,)
+    updated_at = models.DateTimeField('Время последнего обновления отзыва', auto_now=True,)
+    active = models.BooleanField('Состояние отзыва', default=True,)
+    rating = models.CharField('Рейтинг отеля', max_length=25, choices=RATING_1_5, null=True, blank=True,)
+
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+
+    def __str__(self):
+        return f'Отзыв от - {self.owner.email}'

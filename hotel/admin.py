@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from hotel.models import Room, Visitor, Gym
+from hotel.models import Room, Visitor, Gym, Reviews
 
 
 class ReviewVisitorsInRoom(admin.TabularInline):
@@ -39,5 +39,15 @@ class GymAdmin(admin.ModelAdmin):
     ordering = ('data_start', 'data_end',)
     readonly_fields = ('price', 'data_end', 'data_start')
     autocomplete_fields = ('visitor',)
+
+
+@admin.register(Reviews)
+class ReviewsAdmin(admin.ModelAdmin):
+    list_display = ('owner', 'created_at', 'active', 'rating')
+    ordering = ('created_at',)
+    search_fields = ('owner', 'rating',)
+    list_editable = ('active',)
+    list_filter = ('rating',)
+
 
 
