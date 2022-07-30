@@ -24,13 +24,3 @@ class EmailAdmin(admin.ModelAdmin):
 class CustomerLettersAdmin(admin.ModelAdmin):
     list_display = ('user', 'subject', )
     search_fields = ('subject',)
-
-
-
-
-
-
-
-
-
-
