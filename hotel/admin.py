@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from hotel.models import Room, Visitor, Gym, Reviews
+from hotel.models import Room, Visitor, Gym, Reviews, ApplicationForRoomBron
 
 
 class ReviewVisitorsInRoom(admin.TabularInline):
@@ -50,4 +50,11 @@ class ReviewsAdmin(admin.ModelAdmin):
     list_filter = ('rating',)
 
 
+@admin.register(ApplicationForRoomBron)
+class ApplicationForBronAdmin(admin.ModelAdmin):
 
+    list_display = ('user', 'room', 'status',)
+    search_fields = ('user', 'room',)
+    list_filter = ('status',)
+    list_editable = ('status',)
+    readonly_fields = ('user', 'room',)

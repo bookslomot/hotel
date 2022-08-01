@@ -11,9 +11,18 @@ urlpatterns = [
     path('auth/', include('djoser.urls.authtoken')),
     # MY APPS
     path('hotel/', include('hotel.urls')),
-    path('user/', include('user.urls'))
+    path('user/', include('user.urls')),
+    path('sendemail/', include('sendemail.urls')),
 ]
 
 if settings.DEBUG:
+    import debug_toolbar
+    import mimetypes
+
+    mimetypes.add_type("application/javascript", ".js", True)
+
     urlpatterns += static(settings.MEDIA_URL,
                           document_root=settings.MEDIA_ROOT)
+    urlpatterns = [
+                      path('__debug__/', include(debug_toolbar.urls))
+                  ] + urlpatterns

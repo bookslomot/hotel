@@ -1,8 +1,10 @@
 import datetime
+
 from django.db import models
 from phonenumber_field import modelfields
 
-from hotel.services import set_data_end_gym, set_price, check_in_hotel_visitor, read_price_json_from_txt
+from hotel.services import set_data_end_gym, set_price, check_in_hotel_visitor, read_price_json_from_txt, \
+    accepted_application_for_room
 from user.models import User
 
 
@@ -58,8 +60,9 @@ class Visitor(models.Model):
     phone = modelfields.PhoneNumberField('Номер телефона', max_length=255)
     adult = models.BooleanField('Совершенолетие',
                                 help_text='True - гость достиг совершенолетия. '
-                                          'False - гость не достиг совершенолетия')
-    numbers_passport = models.PositiveIntegerField('Номер паспорта')
+                                          'False - гость не достиг совершенолетия',
+                                default=False)
+    numbers_passport = models.PositiveBigIntegerField('Номер паспорта',)
     number_room = models.ForeignKey(Room, verbose_name='Номер проживания', blank=True,
                                     on_delete=models.PROTECT, null=True, default=None)
     gym = models.ManyToManyField('Gym', verbose_name='Абонимент в спортзал',
@@ -82,6 +85,10 @@ class Visitor(models.Model):
 
     def add_gym(self, gym):
         self.gym.add(gym)
+
+    def add_room(self, room):
+        self.number_room = room
+        self.save()
 
     def __str__(self):
         return f'{self.first_name} {self.last_name} ({self.online_client})'
@@ -148,3 +155,29 @@ class Reviews(models.Model):
 
     def __str__(self):
         return f'Отзыв от - {self.owner.email}'
+
+
+class ApplicationForRoomBron(models.Model):
+
+    STATYS_APPLICATION = (
+        ('True', 'Одобрена'),
+        ('False', 'Откланенна'),
+        ('in progress', 'В процессе обработки')
+    )
+
+    user = models.ForeignKey(User, verbose_name='Владелец заявки на бронь', on_delete=models.SET_NULL, null=True)
+    room = models.ForeignKey(Room, verbose_name='Желаемая комната на бронь', on_delete=models.SET_NULL, null=True)
+    status = models.CharField('Статус заявки', choices=STATYS_APPLICATION, max_length=255, blank=True,
+                              default=STATYS_APPLICATION[2][0])
+
+    class Meta:
+        verbose_name = 'Заявка на бронь комнаты'
+        verbose_name_plural = 'Заявки на бронь комнаты'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.status == 'True':
+            accepted_application_for_room(self.user.email, self.room)
+
+    def __str__(self):
+        return f'Заявка {self.user} на комнату {self.room}'

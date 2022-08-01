@@ -1,7 +1,7 @@
 from django.urls import path
 
-from sendemail.views import CreateCustomerLettersAPIView
+from sendemail.views import post_latter
 
 urlpatterns = [
-    path('', CreateCustomerLettersAPIView.as_view())
+    path('', post_latter)
 ]
