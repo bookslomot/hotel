@@ -1,12 +1,13 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
+from hotel.filters import RoomFilter
 from hotel.models import Room, ApplicationForRoomBron
 from hotel.serializer import RoomSerializers
 from my_exeptions.exeptions_fun.exeptions_views import base_view
@@ -28,14 +29,14 @@ class CategoriesRoomAPIView(generics.ListAPIView):
              'category',
              'price',
              'number_of_places',
-             'free')
+             )
 
     serializer_class = RoomSerializers
     permission_classes = [IsAuthenticated]
 
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
 
-    filterset_fields = ['category', 'number_of_places', 'free']
+    filterset_class = RoomFilter
     ordering_fields = ['number', 'number_of_places']
 
 
@@ -48,7 +49,7 @@ class ApplicationRoomViewSets(APIView):
 
     def post(self, request, *args, **kwargs):
         room = Room.objects.get(pk=self.kwargs['pk'])
-        if not room.free:
+        if room.visitor_set.all().exists():
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
         ApplicationForRoomBron.objects.create(

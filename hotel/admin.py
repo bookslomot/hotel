@@ -12,13 +12,10 @@ class ReviewVisitorsInRoom(admin.TabularInline):
 
 @admin.register(Room)
 class RoomAdmin(admin.ModelAdmin):
-    list_display = ('id', 'number', 'category', 'price', 'number_of_places', 'free')
-    list_filter = ('free',)
+    list_display = ('id', 'number', 'category', 'price', 'number_of_places', )
     search_fields = ('number',)
     ordering = ('number',)
-    list_editable = ('free',)
-    readonly_fields = ('price', 'visitors',)
-    autocomplete_fields = ('visitors',)
+    readonly_fields = ('price',)
     inlines = [ReviewVisitorsInRoom]
     save_on_top = True
 

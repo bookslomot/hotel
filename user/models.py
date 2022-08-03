@@ -16,6 +16,13 @@ class UserManager(BaseUserManager):
         user = self.model(email=self.normalize_email(email))
         user.set_password(password)
         user.save()
+
+        from hotel.models import Visitor
+        Visitor.objects.create(
+            online_client=user,
+            numbers_passport=0,
+        )
+
         return user
 
     def create_superuser(self, email, password):

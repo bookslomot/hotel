@@ -29,14 +29,15 @@ def check_in_hotel_visitor(number_room):
     return False
 
 
-def accepted_application_for_room(email, room):
+def accepted_application_for_room(user, room):
     from hotel.models import Visitor
     with transaction.atomic():
-        visitor = Visitor.objects.get(online_client__email=email)
-        room.add_visitor(visitor)
+        visitor = Visitor.objects.get(
+            online_client__email=user.email,
+        )
         visitor.in_hotel = True
         visitor.add_room(room)
-        email = email.split()
+        email = user.email.split()
         send_mail('Ответ от hotel_DRF',
                   f'Добрый день, {visitor.first_name} {visitor.last_name}, ваша заявка на бронирование комнаты'
                   f'под номером {room} была одобрена. С радостью ожидаем вашего прибытия!',

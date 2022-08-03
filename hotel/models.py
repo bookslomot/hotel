@@ -3,7 +3,7 @@ import datetime
 from django.db import models
 from phonenumber_field import modelfields
 
-from hotel.services import set_data_end_gym, set_price, check_in_hotel_visitor, read_price_json_from_txt, \
+from hotel.services import set_data_end_gym, set_price, read_price_json_from_txt, \
     accepted_application_for_room
 from user.models import User
 
@@ -27,10 +27,6 @@ class Room(models.Model):
                                 default='Standard')
     price = models.DecimalField('Цена за ночь', max_digits=8, decimal_places=2, default=1, blank=True)
     number_of_places = models.PositiveSmallIntegerField('Колличество мест')
-    free = models.BooleanField('Свободен', default=True,
-                               help_text='True - в номере никто не проживает'
-                                         'False - на данный момент номер занят')
-    visitors = models.ManyToManyField('Visitor', verbose_name='Гости в номере', blank=True)
 
     class Meta:
         verbose_name = 'Номер'
@@ -40,11 +36,6 @@ class Room(models.Model):
         super().save(*args, **kwargs)
         self.price = set_price(self.category, 'price_room.txt')
         super().save(*args, **kwargs)
-
-    def add_visitor(self, visitor):
-        self.visitors.add(visitor)
-        self.free = False
-        super().save()
 
     def __str__(self):
         return f'Номер - {self.number}'
@@ -56,7 +47,7 @@ class Visitor(models.Model):
                                       null=True,
                                       blank=True)
     first_name = models.CharField('Имя пользователя', max_length=255)
-    last_name = models.CharField('Фамилия пользователя', max_length=255, db_index=True)
+    last_name = models.CharField('Фамилия пользователя', max_length=255,)
     phone = modelfields.PhoneNumberField('Номер телефона', max_length=255)
     adult = models.BooleanField('Совершенолетие',
                                 help_text='True - гость достиг совершенолетия. '
@@ -75,13 +66,6 @@ class Visitor(models.Model):
     class Meta:
         verbose_name = 'Посетител'
         verbose_name_plural = 'Посетители'
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if check_in_hotel_visitor(self.number_room):
-            self.in_hotel = True
-            self.number_room.add_visitor(self)
-        super().save(*args, **kwargs)
 
     def add_gym(self, gym):
         self.gym.add(gym)
@@ -177,7 +161,7 @@ class ApplicationForRoomBron(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self.status == 'True':
-            accepted_application_for_room(self.user.email, self.room)
+            accepted_application_for_room(self.user, self.room)
 
     def __str__(self):
         return f'Заявка {self.user} на комнату {self.room}'
