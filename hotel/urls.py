@@ -2,14 +2,14 @@ from django.urls import path
 
 from hotel.views import get_category_room, RoomListAPIView, ApplicationRoomAPIView, \
     BuySubscriptionForGymCreateAPIView, get_rules_room, get_rules_gym,\
-    SubscriptionForGymRetrieveAPIView,  ReviewsCreateRetrieveViewSets
+    SubscriptionForGymRetrieveAPIView,  ReviewsCreateListViewSets
 
 
-review_retrieve = ReviewsCreateRetrieveViewSets.as_view({
+review_retrieve = ReviewsCreateListViewSets.as_view({
     'get': 'list',
 })
 
-review_create = ReviewsCreateRetrieveViewSets.as_view({
+review_create = ReviewsCreateListViewSets.as_view({
     'post': 'create',
 })
 

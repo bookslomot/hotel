@@ -97,7 +97,7 @@ class SubscriptionForGymRetrieveAPIView(APIView):
         return Response(data=serializers.data, status=status.HTTP_200_OK)
 
 
-class ReviewsCreateRetrieveViewSets(viewsets.ModelViewSet):
+class ReviewsCreateListViewSets(viewsets.ModelViewSet):
 
     serializer_class = ReviewsSerializers
     permission_classes = [IsAuthenticated]
