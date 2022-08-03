@@ -1,10 +1,7 @@
-import datetime
-
 from django.db import models
 from phonenumber_field import modelfields
 
-from hotel.services import set_data_end_gym, set_price, read_price_json_from_txt, \
-    accepted_application_for_room
+from hotel.services import set_data_end_gym, set_price, read_price_json_from_txt, accepted_application_for_room
 from user.models import User
 
 
@@ -35,7 +32,7 @@ class Room(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         self.price = set_price(self.category, 'price_room.txt')
-        super().save(*args, **kwargs)
+        super().save(update_fields=['price'])
 
     def __str__(self):
         return f'Номер - {self.number}'
@@ -92,7 +89,7 @@ class Gym(models.Model):
     visitor = models.OneToOneField(Visitor, verbose_name='Гость', on_delete=models.CASCADE, related_name='related_gum')
     period = models.CharField('Колличество месяцев', max_length=255, choices=PERIOD_CHOICES, blank=False, default=1)
     data_start = models.DateTimeField('Дата покупки', auto_now_add=True)
-    data_end = models.DateTimeField('Дата окончания ', default=datetime.datetime.now())
+    data_end = models.DateTimeField('Дата окончания ', blank=True, null=True)
     price = models.CharField('Цена', max_length=255, default='',
                              blank=True,
                              help_text=f'Месяц - {PRICE_GYM["1"]}.\
@@ -108,12 +105,12 @@ class Gym(models.Model):
     def __str__(self):
         return f'Абонимент в зал гостя - {self.visitor.first_name} {self.visitor.last_name}'
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+    def save(self, *args, **kwargs, ):
+        super(Gym, self).save()
         self.data_end = set_data_end_gym(int(self.period), self.data_start)
         self.price = set_price(self.period, 'price_gym.txt')
         self.visitor.add_gym(self)
-        super().save(*args, **kwargs)
+        super(Gym, self).save(update_fields=['data_end', 'price'])
 
 
 class Reviews(models.Model):
@@ -143,7 +140,7 @@ class Reviews(models.Model):
 
 class ApplicationForRoomBron(models.Model):
 
-    STATYS_APPLICATION = (
+    STATUS_APPLICATION = (
         ('True', 'Одобрена'),
         ('False', 'Откланенна'),
         ('in progress', 'В процессе обработки')
@@ -151,8 +148,8 @@ class ApplicationForRoomBron(models.Model):
 
     user = models.ForeignKey(User, verbose_name='Владелец заявки на бронь', on_delete=models.SET_NULL, null=True)
     room = models.ForeignKey(Room, verbose_name='Желаемая комната на бронь', on_delete=models.SET_NULL, null=True)
-    status = models.CharField('Статус заявки', choices=STATYS_APPLICATION, max_length=255, blank=True,
-                              default=STATYS_APPLICATION[2][0])
+    status = models.CharField('Статус заявки', choices=STATUS_APPLICATION, max_length=255, blank=True,
+                              default=STATUS_APPLICATION[2][0])
 
     class Meta:
         verbose_name = 'Заявка на бронь комнаты'

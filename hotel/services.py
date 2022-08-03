@@ -43,3 +43,9 @@ def accepted_application_for_room(user, room):
                   f'под номером {room} была одобрена. С радостью ожидаем вашего прибытия!',
                   settings.EMAIL_HOST_USER,
                   email)
+
+
+def read_rules(path):
+    with open('A:\\Django\\hotel_DRF\\hotel\\' + path, encoding='utf-8') as f:
+        data = f.read()
+    return data
