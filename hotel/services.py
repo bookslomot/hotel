@@ -5,9 +5,11 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.db import transaction
 
+from hotel_DRF.settings import BASE_DIR
+
 
 def read_price_json_from_txt(path):
-    with open('A:\\Django\\hotel_DRF\\hotel\\' + path) as f:
+    with open(f'{BASE_DIR}\\hotel\\' + path) as f:
         data = f.read()
     js_data = json.loads(data)
     return js_data
@@ -46,6 +48,6 @@ def accepted_application_for_room(user, room):
 
 
 def read_rules(path):
-    with open('A:\\Django\\hotel_DRF\\hotel\\' + path, encoding='utf-8') as f:
+    with open(f'{BASE_DIR}\\hotel\\' + path, encoding='utf-8') as f:
         data = f.read()
     return data

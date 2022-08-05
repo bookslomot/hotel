@@ -5,6 +5,8 @@ from django.db import transaction
 from django.http import JsonResponse
 from rest_framework import status
 
+
+
 JSON_DUMPS_PARAMS = {
     'ensure_ascii': False
 }
@@ -30,6 +32,7 @@ def error_response(exception):
 
 def base_view(fn):
     """Декоратор для всех вьюшек, обрабатываент исключения"""
+
     @functools.wraps(fn)
     def inner(request, *args, **kwargs):
         try:

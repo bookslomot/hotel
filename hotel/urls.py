@@ -1,4 +1,5 @@
 from django.urls import path
+from django.views.decorators.cache import cache_page
 
 from hotel.views import get_category_room, RoomListAPIView, ApplicationRoomAPIView, \
     BuySubscriptionForGymCreateAPIView, get_rules_room, get_rules_gym,\
@@ -6,7 +7,7 @@ from hotel.views import get_category_room, RoomListAPIView, ApplicationRoomAPIVi
 
 
 review_retrieve = ReviewsCreateListViewSets.as_view({
-    'get': 'list',
+    'get': 'retrieve',
 })
 
 review_create = ReviewsCreateListViewSets.as_view({
@@ -16,18 +17,18 @@ review_create = ReviewsCreateListViewSets.as_view({
 
 urlpatterns = [
     # MAIN
-    path('categories/', get_category_room),
+    path('categories', cache_page(60)(get_category_room)),
     # RULES
-    path('rules-room/', get_rules_room),
-    path('rules-gym/', get_rules_gym),
+    path('rules-room', cache_page(60)(get_rules_room)),
+    path('rules-gym', cache_page(60)(get_rules_gym)),
     # ROOM
-    path('room/', RoomListAPIView.as_view()),
+    path('room', cache_page(60)(RoomListAPIView.as_view())),
     path('room/<int:pk>', ApplicationRoomAPIView.as_view()),
     # GYM
     path('gym_buy', BuySubscriptionForGymCreateAPIView.as_view()),
-    path('my_gym', SubscriptionForGymRetrieveAPIView.as_view()),
+    path('my_gym', cache_page(30)(SubscriptionForGymRetrieveAPIView.as_view())),
     # RETRIEVE
-    path('send_retrieve/', review_create, name='review_create'),
-    path('my_retrieve/', review_retrieve, name='review_retrieve'),
+    path('send_retrieve', review_create, name='review_create'),
+    path('my_retrieve', cache_page(60)(review_retrieve), name='review_retrieve'),
 
 ]

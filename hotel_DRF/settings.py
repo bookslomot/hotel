@@ -18,6 +18,32 @@ environ.Env.read_env()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'my_formatter': {
+            'format': '{levelname} {asctime} {module} {process:d} {message}',
+            'style': '{',
+
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'WARNING',
+            'class': 'logging.FileHandler',
+            'filename': f'{BASE_DIR}/log.log',
+            'formatter': 'my_formatter'
+        }
+    },
+    'loggers': {
+        'hotel': {
+            'handlers': ['file'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -49,6 +75,7 @@ INSTALLED_APPS = [
     'django_filters',
     'djoser',
     'debug_toolbar',
+    'drf_yasg',
 
     'user.apps.UserConfig',
     'hotel.apps.HotelConfig',
@@ -151,6 +178,16 @@ DJOSER = {
     'SEND_ACTIVATION_EMAIL':  False,
     'LOGOUT_ON_PASSWORD_CHANGE': True,
     'SERIALIZERS': {},
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:6379/',
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
 }
 
 # Static files (CSS, JavaScript, Images)

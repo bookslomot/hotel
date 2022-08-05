@@ -4,15 +4,18 @@ from user.models import User
 
 
 class Latter(models.Model):
+    """Абстрактная модель письма"""
 
-    subject = models.CharField(max_length=75)
-    message = models.TextField(max_length=1024)
+    subject = models.CharField('Заголовок', max_length=75)
+    message = models.TextField('Тело письма', max_length=1024)
+    attach = models.FileField('Файл', upload_to='send_mail/file/%Y/%m/%d/', null=True, blank=True)
 
     class Meta:
         abstract = True
 
 
 class MailingLetters(Latter):
+    """Модель для хранения всех писем от администрации сайта"""
 
     send = (
         ('SEND', 'Отправить'),
@@ -29,6 +32,7 @@ class MailingLetters(Latter):
 
 
 class VisitorLetters(Latter):
+    """Модель для хранения всех писем от пользователей сайта"""
 
     user = models.ForeignKey(User, on_delete=models.PROTECT)
 

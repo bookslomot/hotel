@@ -122,7 +122,7 @@ class Reviews(models.Model):
         ('5', 'amazing')
     )
 
-    owner = models.ForeignKey(User, verbose_name='Автор отзыва', on_delete=models.PROTECT,)
+    owner = models.OneToOneField(User, verbose_name='Автор отзыва', on_delete=models.PROTECT,)
     body = models.TextField('Тело текста отзыва', max_length=1024,)
     file = models.FileField('Прикрепленный файл к отзыву', upload_to='reviews/%Y/%m/%d/', null=True, blank=True,)
     created_at = models.DateTimeField('Время создания отзыва', auto_now_add=True,)

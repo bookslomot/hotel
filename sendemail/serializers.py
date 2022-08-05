@@ -12,9 +12,10 @@ class ReviewUserInVisitorLetters(serializers.ModelSerializer):
 
 
 class LettersSerializer(serializers.ModelSerializer):
+    """Сериализация писем пользователей """
 
     user = ReviewUserInVisitorLetters(read_only=True)
 
     class Meta:
         model = VisitorLetters
-        fields = ('subject', 'message', 'user')
+        fields = ('subject', 'message', 'user', 'attach')

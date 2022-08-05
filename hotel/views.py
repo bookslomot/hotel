@@ -1,3 +1,5 @@
+import logging
+from django.core.exceptions import ObjectDoesNotExist
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -9,10 +11,14 @@ from rest_framework.views import APIView
 
 from hotel.filters import RoomFilter
 from hotel.models import Room, ApplicationForRoomBron, Gym, Visitor, Reviews
+from hotel.permissions import IsOwner
 from hotel.serializer import RoomSerializers, BuySubscriptionForGymSerializers, SubscriptionForGymSerializers, \
     ReviewsSerializers
+from my_exeptions.exeptions_class.exeptions_views import BaseView
 from my_exeptions.exeptions_fun.exeptions_views import base_view
 from hotel.services import read_price_json_from_txt, read_rules
+
+logger = logging.getLogger(__name__)
 
 
 @base_view
@@ -36,7 +42,7 @@ def get_rules_gym(request):
     return Response(data=data, status=status.HTTP_200_OK)
 
 
-class RoomListAPIView(generics.ListAPIView):
+class RoomListAPIView(generics.ListAPIView, BaseView):
 
     queryset = Room.objects.\
         all().\
@@ -55,7 +61,7 @@ class RoomListAPIView(generics.ListAPIView):
     ordering_fields = ['number', 'number_of_places']
 
 
-class ApplicationRoomAPIView(APIView):
+class ApplicationRoomAPIView(APIView, BaseView, logging.Handler):
 
     def get(self, *args, **kwargs):
         room = Room.objects.get(pk=self.kwargs['pk'])
@@ -74,7 +80,7 @@ class ApplicationRoomAPIView(APIView):
         return Response(status=status.HTTP_201_CREATED)
 
 
-class BuySubscriptionForGymCreateAPIView(generics.CreateAPIView):
+class BuySubscriptionForGymCreateAPIView(generics.CreateAPIView, BaseView):
 
     serializer_class = BuySubscriptionForGymSerializers
     permission_classes = [IsAuthenticated]
@@ -89,24 +95,38 @@ class BuySubscriptionForGymCreateAPIView(generics.CreateAPIView):
         return Response(data=json_data, status=status.HTTP_200_OK)
 
 
-class SubscriptionForGymRetrieveAPIView(APIView):
+class SubscriptionForGymRetrieveAPIView(APIView, BaseView):
 
     def get(self, *args, **kwargs):
-        gym = Gym.objects.get(visitor__online_client=self.request.user)
-        serializers = SubscriptionForGymSerializers(gym)
-        return Response(data=serializers.data, status=status.HTTP_200_OK)
+        try:
+            gym = Gym.objects.get(visitor__online_client=self.request.user)
+            serializers = SubscriptionForGymSerializers(gym)
+            return Response(data=serializers.data, status=status.HTTP_200_OK)
+        except ObjectDoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class ReviewsCreateListViewSets(viewsets.ModelViewSet):
+class ReviewsCreateListViewSets(viewsets.ModelViewSet, BaseView):
 
     serializer_class = ReviewsSerializers
     permission_classes = [IsAuthenticated]
     queryset = Reviews
 
+    def get_permissions(self):
+        if self.action in ['retrieve']:
+            permission_classes = [IsOwner]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
-    def list(self, request, *args, **kwargs):
-        queryset = Reviews.objects.filter(owner=request.user)
+    def retrieve(self, request, *args, **kwargs):
+        queryset = Reviews.objects.\
+            filter(owner=request.user).\
+            only('body',
+                 'rating'
+                 )
         serializer = ReviewsSerializers(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
