@@ -1,13 +1,14 @@
 import logging
 from django.core.exceptions import ObjectDoesNotExist
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import status
+from rest_framework import status, mixins
 from rest_framework.decorators import api_view
 from rest_framework.filters import OrderingFilter
 from rest_framework.response import Response
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet
 
 from hotel.filters import RoomFilter
 from hotel.models import Room, ApplicationForRoomBron, Gym, Visitor, Reviews
@@ -61,7 +62,7 @@ class RoomListAPIView(generics.ListAPIView, BaseView):
     ordering_fields = ['number', 'number_of_places']
 
 
-class ApplicationRoomAPIView(APIView, BaseView, logging.Handler):
+class ApplicationRoomAPIView(APIView, BaseView):
 
     def get(self, *args, **kwargs):
         room = Room.objects.get(pk=self.kwargs['pk'])
@@ -106,7 +107,10 @@ class SubscriptionForGymRetrieveAPIView(APIView, BaseView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
-class ReviewsCreateListViewSets(viewsets.ModelViewSet, BaseView):
+class ReviewsCreateListViewSets(mixins.CreateModelMixin,
+                                mixins.RetrieveModelMixin,
+                                mixins.UpdateModelMixin,
+                                GenericViewSet):
 
     serializer_class = ReviewsSerializers
     permission_classes = [IsAuthenticated]
@@ -130,3 +134,11 @@ class ReviewsCreateListViewSets(viewsets.ModelViewSet, BaseView):
                  )
         serializer = ReviewsSerializers(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def update(self, request, *args, **kwargs):
+        instance = Reviews.objects.get(owner=request.user)
+        serializer = ReviewsSerializers(instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

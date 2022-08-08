@@ -23,7 +23,7 @@ LOGGING = {
     'disable_existing_loggers': False,
     'formatters': {
         'my_formatter': {
-            'format': '{levelname} {asctime} {module} {process:d} {message}',
+            'format': '{levelname} {asctime} {module} {process:d} {name} {message}',
             'style': '{',
 
         },
@@ -76,10 +76,15 @@ INSTALLED_APPS = [
     'djoser',
     'debug_toolbar',
     'drf_yasg',
+    'channels',
+
 
     'user.apps.UserConfig',
     'hotel.apps.HotelConfig',
     'sendemail.apps.SendemailConfig',
+    'chat',
+
+
 
 ]
 
@@ -212,3 +217,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 INTERNAL_IPS = [
     "127.0.0.1",
 ]
+
+ASGI_APPLICATION = "hotel_DRF.routing.application"
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}

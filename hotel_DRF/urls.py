@@ -17,6 +17,7 @@ urlpatterns = [
     path('hotel/', include('hotel.urls')),
     path('user/', include('user.urls')),
     path('sendemail/', include('sendemail.urls')),
+    path('', include('chat.urls')),
 ]
 
 urlpatterns += doc_url

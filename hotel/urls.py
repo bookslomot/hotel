@@ -8,6 +8,7 @@ from hotel.views import get_category_room, RoomListAPIView, ApplicationRoomAPIVi
 
 review_retrieve = ReviewsCreateListViewSets.as_view({
     'get': 'retrieve',
+    'patch': 'update'
 })
 
 review_create = ReviewsCreateListViewSets.as_view({
