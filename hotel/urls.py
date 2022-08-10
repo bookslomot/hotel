@@ -23,8 +23,8 @@ urlpatterns = [
     path('rules-room', cache_page(60)(get_rules_room)),
     path('rules-gym', cache_page(60)(get_rules_gym)),
     # ROOM
-    path('room', cache_page(60)(RoomListAPIView.as_view())),
-    path('room/<int:pk>', ApplicationRoomAPIView.as_view()),
+    path('room', cache_page(60)(RoomListAPIView.as_view()), name='room-list'),
+    path('room/<int:pk>', ApplicationRoomAPIView.as_view(), name='room-retrieve'),
     # GYM
     path('gym_buy', BuySubscriptionForGymCreateAPIView.as_view()),
     path('my_gym', cache_page(30)(SubscriptionForGymRetrieveAPIView.as_view())),
