@@ -13,9 +13,11 @@ class RoomAPITestCase(APITestCase):
     """ Тестирование API комнат"""
 
     def setUp(self):
-        # Создаются две кастомные комнаты
+        # Создаются кастомные комнаты
         self.room_1 = Room.objects.create(id=1, number=1, number_of_places=2)
-        self.room_2 = Room.objects.create(id=2, number=2, number_of_places=5)
+        self.room_2 = Room.objects.create(id=2, number=2, number_of_places=5, category='Lux')
+        self.room_3 = Room.objects.create(id=3, number=3, number_of_places=2, category='Studio')
+        self.room_4 = Room.objects.create(id=4, number=4, number_of_places=3)
         # Создается зарегистрированный пользователь
         user = get_user_model()
         self.user = user.objects.create_user(email='testmail@gmail.com', password='12345678u')
@@ -26,7 +28,10 @@ class RoomAPITestCase(APITestCase):
         """ Тестирование на корректный вывод списка комнат и статус кода """
         url = reverse('room-list')
         response = self.auth_client.get(url)
-        serializer_data = RoomSerializers([self.room_1, self.room_2], many=True).data
+        serializer_data = RoomSerializers([self.room_1,
+                                           self.room_2,
+                                           self.room_3,
+                                           self.room_4], many=True).data
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data)
 
@@ -35,5 +40,24 @@ class RoomAPITestCase(APITestCase):
         url = reverse('room-retrieve', args=[2])
         response = self.client.get(url)
         serializer_data = RoomSerializers(self.room_2).data
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(serializer_data, response.data)
+
+    def test_filter_price(self):
+        """ Тестирование фильтрации цены списка комнат """
+        url = reverse('room-list')
+        response = self.auth_client.get(url, data={'price_max': '10000.00',
+                                                   'price_min': '3000.00'})
+        serializer_data = RoomSerializers([self.room_1, self.room_4], many=True).data
+        print(response.data)
+        self.assertEqual(status.HTTP_200_OK, response.status_code)
+        self.assertEqual(serializer_data, response.data)
+
+    def test_filter_number_of_places(self):
+        """ Тестирование фильтрации по количеству комнат списка комнат """
+        url = reverse('room-list')
+        response = self.auth_client.get(url, data={'number_of_places': 5})
+        serializer_data = RoomSerializers([self.room_2], many=True).data
+        print(response.data)
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data)
