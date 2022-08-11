@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from hotel.models import Room, Visitor, Gym, Reviews, ApplicationForRoomBron
+from hotel.models import Room, Visitor, Gym, Review, ApplicationForRoomBron
 
 
 class ReviewVisitorsInRoom(admin.TabularInline):
@@ -38,7 +38,7 @@ class GymAdmin(admin.ModelAdmin):
     autocomplete_fields = ('visitor',)
 
 
-@admin.register(Reviews)
+@admin.register(Review)
 class ReviewsAdmin(admin.ModelAdmin):
     list_display = ('owner', 'created_at', 'active', 'rating')
     ordering = ('created_at',)

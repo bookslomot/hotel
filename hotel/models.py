@@ -43,9 +43,12 @@ class Visitor(models.Model):
                                       on_delete=models.SET_NULL,
                                       null=True,
                                       blank=True)
-    first_name = models.CharField('Имя пользователя', max_length=255)
-    last_name = models.CharField('Фамилия пользователя', max_length=255,)
-    phone = modelfields.PhoneNumberField('Номер телефона', max_length=255)
+    first_name = models.CharField('Имя пользователя', max_length=255,
+                                  default='online_client__first_name')
+    last_name = models.CharField('Фамилия пользователя', max_length=255,
+                                 default='online_client__last_name')
+    phone = modelfields.PhoneNumberField('Номер телефона', max_length=255,
+                                         default='online_client__phone')
     adult = models.BooleanField('Совершенолетие',
                                 help_text='True - гость достиг совершенолетия. '
                                           'False - гость не достиг совершенолетия',
@@ -113,7 +116,7 @@ class Gym(models.Model):
         super(Gym, self).save(update_fields=['data_end', 'price'])
 
 
-class Reviews(models.Model):
+class Review(models.Model):
     RATING_1_5 = (
         ('1', 'terribly'),
         ('2', 'bad'),

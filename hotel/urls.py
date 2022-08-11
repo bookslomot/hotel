@@ -24,8 +24,8 @@ urlpatterns = [
     path('room', cache_page(60)(views.RoomListAPIView.as_view()), name='room-list'),
     path('room/<int:pk>', views.ApplicationRoomAPIView.as_view(), name='room-retrieve'),
     # GYM
-    path('gym_buy', views.BuySubscriptionForGymCreateAPIView.as_view()),
-    path('my_gym', cache_page(30)(views.SubscriptionForGymRetrieveAPIView.as_view())),
+    path('gym_buy', views.BuySubscriptionForGymCreateAPIView.as_view(), name='buy-gym'),
+    path('my_gym', cache_page(30)(views.SubscriptionForGymRetrieveAPIView.as_view()), name='my-gym'),
     # RETRIEVE
     path('send_retrieve', review_create, name='review_create'),
     path('my_retrieve', cache_page(60)(review_retrieve), name='review_retrieve'),

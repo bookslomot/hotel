@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from hotel.models import Room, Gym, Reviews
+from hotel.models import Room, Gym, Review
 
 
 class RoomSerializers(serializers.ModelSerializer):
@@ -27,5 +27,5 @@ class SubscriptionForGymSerializers(serializers.ModelSerializer):
 class ReviewsSerializers(serializers.ModelSerializer):
 
     class Meta:
-        model = Reviews
+        model = Review
         fields = ('id', 'body', 'rating',)

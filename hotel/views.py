@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import GenericViewSet
 
 from hotel.filters import RoomFilter
-from hotel.models import Room, ApplicationForRoomBron, Gym, Visitor, Reviews
+from hotel.models import Room, ApplicationForRoomBron, Gym, Visitor, Review
 from hotel.permissions import IsOwner
 from hotel.serializer import RoomSerializers, BuySubscriptionForGymSerializers, SubscriptionForGymSerializers, \
     ReviewsSerializers
@@ -91,7 +91,8 @@ class BuySubscriptionForGymCreateAPIView(generics.CreateAPIView, BaseView):
         visitor = Visitor.objects.get(online_client=self.request.user)
         serializer.save(visitor=visitor)
 
-    def get(self, *args, **kwargs):
+    @classmethod
+    def get(cls, *args, **kwargs):
         json_data = read_price_json_from_txt('price_gym.txt')
         return Response(data=json_data, status=status.HTTP_200_OK)
 
@@ -114,7 +115,7 @@ class ReviewsCreateListViewSets(mixins.CreateModelMixin,
 
     serializer_class = ReviewsSerializers
     permission_classes = [IsAuthenticated]
-    queryset = Reviews
+    queryset = Review
 
     def get_permissions(self):
         if self.action in ['retrieve']:
@@ -127,7 +128,7 @@ class ReviewsCreateListViewSets(mixins.CreateModelMixin,
         serializer.save(owner=self.request.user)
 
     def retrieve(self, request, *args, **kwargs):
-        queryset = Reviews.objects.\
+        queryset = Review.objects.\
             filter(owner=request.user).\
             only('body',
                  'rating'
@@ -136,9 +137,9 @@ class ReviewsCreateListViewSets(mixins.CreateModelMixin,
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def update(self, request, *args, **kwargs):
-        instance = Reviews.objects.get(owner=request.user)
+        instance = Review.objects.get(owner=request.user)
         serializer = ReviewsSerializers(instance, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
