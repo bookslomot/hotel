@@ -43,12 +43,9 @@ class Visitor(models.Model):
                                       on_delete=models.SET_NULL,
                                       null=True,
                                       blank=True)
-    first_name = models.CharField('Имя пользователя', max_length=255,
-                                  default='online_client__first_name')
-    last_name = models.CharField('Фамилия пользователя', max_length=255,
-                                 default='online_client__last_name')
-    phone = modelfields.PhoneNumberField('Номер телефона', max_length=255,
-                                         default='online_client__phone')
+    first_name = models.CharField('Имя пользователя', max_length=255,)
+    last_name = models.CharField('Фамилия пользователя', max_length=255,)
+    phone = modelfields.PhoneNumberField('Номер телефона', max_length=255,)
     adult = models.BooleanField('Совершенолетие',
                                 help_text='True - гость достиг совершенолетия. '
                                           'False - гость не достиг совершенолетия',

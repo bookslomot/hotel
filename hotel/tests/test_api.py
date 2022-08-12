@@ -6,13 +6,11 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from hotel.models import Room, Gym, Visitor, Review
+from hotel.models import Room, Gym, Visitor, Review, ApplicationForRoomBron
 from hotel.serializer import RoomSerializers, SubscriptionForGymSerializers, ReviewsSerializers
 
 
-class RoomAPITestCase(APITestCase):
-
-    """ Тестирование API комнат"""
+class HotelAPITestCase(APITestCase):
 
     def setUp(self):
         # Создаются комнаты
@@ -24,7 +22,7 @@ class RoomAPITestCase(APITestCase):
         # Создается зарегистрированный пользователь
 
         user = get_user_model()
-        self.user = user.objects.create_user(email='testmail@gmail.com', password='12345678u')
+        self.user = user.objects.create(email='testmail@gmail.com', password='12345678u')
         self.auth_client = Client()
         self.auth_client.force_login(self.user)
 
@@ -67,6 +65,15 @@ class RoomAPITestCase(APITestCase):
         serializer_data = RoomSerializers([self.room_2], many=True).data
         self.assertEqual(status.HTTP_200_OK, response.status_code)
         self.assertEqual(serializer_data, response.data)
+
+    def test_create_application_room(self):
+        """ Тестирование создания заявки"""
+        self.assertEqual(0, ApplicationForRoomBron.objects.count())
+        url = reverse('room-retrieve', args=[2])
+        response = self.auth_client.post(url)
+        self.assertEqual(status.HTTP_201_CREATED, response.status_code)
+        self.assertEqual(1, ApplicationForRoomBron.objects.count())
+        self.assertEqual(True, bool(ApplicationForRoomBron.objects.get(room=self.room_2)))
 
     def test_get_gym(self):
         """ Тестирование просмотра абонемента """
