@@ -128,13 +128,16 @@ class ReviewsCreateListViewSets(mixins.CreateModelMixin,
         serializer.save(owner=self.request.user)
 
     def retrieve(self, request, *args, **kwargs):
-        queryset = Review.objects.\
-            filter(owner=request.user).\
-            only('body',
-                 'rating'
-                 )
-        serializer = ReviewsSerializers(queryset, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        try:
+            queryset = Review.objects.\
+                filter(owner=request.user).\
+                only('body',
+                     'rating'
+                     )
+            serializer = ReviewsSerializers(queryset, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except TypeError:
+            raise Exception('У вас нет отзывов')
 
     def update(self, request, *args, **kwargs):
         instance = Review.objects.get(owner=request.user)

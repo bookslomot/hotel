@@ -54,8 +54,7 @@ class Visitor(models.Model):
     number_room = models.ForeignKey(Room, verbose_name='Номер проживания', blank=True,
                                     on_delete=models.PROTECT, null=True, default=None)
     gym = models.ManyToManyField('Gym', verbose_name='Абонимент в спортзал',
-                                 related_name='related_visitor', blank=True,
-                                 )
+                                 related_name='related_visitor', blank=True,)
     in_hotel = models.BooleanField('Проживает ли на данный момент', default=True)
     check_in_time = models.DateField('Врея заселения', auto_now_add=True)
     eviction_time = models.DateField('Время выселения', null=True, blank=True, default=None)

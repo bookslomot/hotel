@@ -8,6 +8,7 @@ from rest_framework.test import APITestCase
 
 from hotel.models import Room, Gym, Visitor, Review, ApplicationForRoomBron
 from hotel.serializer import RoomSerializers, SubscriptionForGymSerializers, ReviewsSerializers
+from user.models import User
 
 
 class HotelAPITestCase(APITestCase):
@@ -78,8 +79,9 @@ class HotelAPITestCase(APITestCase):
     def test_get_gym(self):
         """ Тестирование просмотра абонемента """
 
-        self.visitor = Visitor.objects.filter(online_client=self.user).last()
-        self.gym = Gym.objects.create(visitor=self.visitor, period='3')
+        visitor = Visitor.objects.get_or_create(online_client=self.user, numbers_passport='12345678')[0]
+
+        self.gym = Gym.objects.create(visitor=visitor, period='3')
         url = reverse('my-gym')
         response = self.auth_client.get(url)
         serializer_data = SubscriptionForGymSerializers(self.gym).data
@@ -88,12 +90,13 @@ class HotelAPITestCase(APITestCase):
 
     def test_post_buy_gym(self):
         """ Тестирование покупки абонемента в зал """
+        visitor = Visitor.objects.get_or_create(online_client=self.user, numbers_passport='12345678')[0]
 
         self.assertEqual(0, Gym.objects.all().count())
         url = reverse('buy-gym')
         data = {
             'period': '3',
-            'visitor': '1',
+            'visitor': visitor.id,
         }
         json_data = json.dumps(data)
         response = self.auth_client.post(url, data=json_data, content_type='application/json')
